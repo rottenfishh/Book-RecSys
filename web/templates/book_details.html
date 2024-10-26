@@ -14,6 +14,13 @@
     <p><strong>Price:</strong> {{ book['Price Starting With ($)'] }}</p>
     <p><strong>Publish Date:</strong> {{ book['Publish Date (Month)'] }} {{ book['Publish Date (Year)'] }}</p>
 
+    <h2>Recommended Books</h2>
+    <ul>
+        {% for rec_book in recommended_books %}
+        <li><a href="{{ rec_book.url }}">{{ rec_book.name }}</a></li>
+        {% endfor %}
+    </ul>
+
     <a href="{{ url_for('home') }}">Back to book list</a>
 </body>
 </html>

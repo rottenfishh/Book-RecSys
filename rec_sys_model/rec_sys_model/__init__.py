@@ -64,15 +64,18 @@ class recSysModel:
         self.embeddings_df = pd.read_csv(path_book_embeddings)
     
     def __parse_embedding(self, embedding_str):
+        return np.array([float(x) for x in embedding_str.iloc[0].split(',')])
+
+    def __parse_emb_str(self, embedding_str):
         return np.array([float(x) for x in embedding_str.split(',')])
-    
+
     def predict(self, record, n=5):
         record_vector = self.__parse_embedding(record['book_embedding']).reshape(1, -1)
         distances = []
         names = []
         length = self.embeddings_df.shape[0]
         for index, row in self.embeddings_df.iterrows():
-            other_vector = self.__parse_embedding(row['book_embedding']).reshape(1, -1)
+            other_vector = self.__parse_emb_str(row['book_embedding']).reshape(1, -1)
             similarity = cosine_similarity(record_vector, other_vector)[0][0]
             distance = 1 - similarity
             distances.append(distance)
