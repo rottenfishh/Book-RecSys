@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books List</title>
+</head>
+<body>
+    <h1>Books</h1>
+    <ul>
+        {% for book in books %}
+        <li>
+            <a href="{{ book.details_url }}">{{ book.Title }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <div>
+        {% if page > 1 %}
+            <a href="{{ url_for('home', page=page-1) }}">Previous</a>
+        {% endif %}
+        Page {{ page }} of {{ total_pages }}
+        {% if page < total_pages %}
+            <a href="{{ url_for('home', page=page+1) }}">Next</a>
+        {% endif %}
+    </div>
+</body>
+</html>
