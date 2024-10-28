@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.Title }} - Metrics</title>
+</head>
+<body>
+    <h1>Metrics for {{ book.Title }}</h1>
+    <p><strong>Authors:</strong> {{ book.Authors }}</p>
+    <p><strong>Description:</strong> {{ book.Description }}</p>
+    <p><strong>Category:</strong> {{ book.Category }}</p>
+    <p><strong>Publisher:</strong> {{ book.Publisher }}</p>
+    <p><strong>Price:</strong> {{ book['Price Starting With ($)'] }}</p>
+    <p><strong>Publish Date:</strong> {{ book['Publish Date (Month)'] }} {{ book['Publish Date (Year)'] }}</p>
+
+    <h2>Top 100 Recommended Books</h2>
+    <ul>
+        {% for rec_book in recommended_books %}
+        <li>
+            <a href="{{ rec_book.url }}">{{ rec_book.name }}</a>
+            <p><strong>Description:</strong> {{ rec_book.description }}</p>
+
+            <!-- Кнопки для оценки от 1 до 5 -->
+            {% for rating in range(1, 6) %}
+            <button type="button" class="rate-button" data-source-book="{{ book.Title }}" data-recommended-book="{{ rec_book.name }}" data-rating="{{ rating }}">
+                Rate {{ rating }}
+            </button>
+            {% endfor %}
+        </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('home') }}">Back to book list</a>
+
+    <!-- Асинхронная отправка рейтинга через JavaScript -->
+    <script>
+        function submitRating(sourceBook, recommendedBook, rating) {
+            fetch("/rate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    source_book: sourceBook,
+                    recommended_book: recommendedBook,
+                    rating: rating
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert("Error: " + data.error);
+                } else {
+                    alert("Success: " + data.message);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        // Привязка обработчиков к кнопкам оценки
+        document.querySelectorAll(".rate-button").forEach(button => {
+            button.addEventListener("click", function() {
+                const sourceBook = this.getAttribute("data-source-book");
+                const recommendedBook = this.getAttribute("data-recommended-book");
+                const rating = this.getAttribute("data-rating");
+                submitRating(sourceBook, recommendedBook, rating);
+            });
+        });
+    </script>
+</body>
+</html>

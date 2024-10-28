@@ -11,6 +11,8 @@
         {% for book in books %}
         <li>
             <a href="{{ book.details_url }}">{{ book.Title }}</a>
+           <span> -----> </span>
+            <a href="{{ book.metric_url }}">Metric</a>
         </li>
         {% endfor %}
     </ul>
