@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.Title }}</title>
+</head>
+<body>
+    <h1>{{ book.Title }}</h1>
+    <p><strong>Authors:</strong> {{ book.Authors }}</p>
+    <p><strong>Description:</strong> {{ book.Description }}</p>
+    <p><strong>Category:</strong> {{ book.Category }}</p>
+    <p><strong>Publisher:</strong> {{ book.Publisher }}</p>
+    <p><strong>Price:</strong> {{ book['Price Starting With ($)'] }}</p>
+    <p><strong>Publish Date:</strong> {{ book['Publish Date (Month)'] }} {{ book['Publish Date (Year)'] }}</p>
+
+    <h2>Recommended Books</h2>
+    <ul>
+        {% for rec_book in recommended_books %}
+        <li><a href="{{ rec_book.url }}">{{ rec_book.name }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('home') }}">Back to book list</a>
+</body>
+</html>
