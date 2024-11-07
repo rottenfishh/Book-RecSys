@@ -1,5 +1,4 @@
 import pandas as pd
-from nltk.corpus.reader import titles
 from sklearn.preprocessing import MultiLabelBinarizer
 import random
 import torch
