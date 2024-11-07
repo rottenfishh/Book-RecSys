@@ -91,6 +91,16 @@ def rate_book():
     metric.to_csv('../Datasets/rating.csv', index=False)
     return jsonify({"message": "Rating added successfully"})
 
+from flask import request, render_template, url_for
+
+@app.route('/search', methods=['GET'])
+def search():
+    title = request.args.get('title')  # Получаем параметр title из строки запроса
+    recommended_books = recsys.closest_title(title, 10)
+    recommended_books_links = [ df[df['Title'] == title] for title in recommended_books ]
+    return render_template('closest_titles.html', recommended_books=recommended_books_links)
 
 if __name__ == '__main__':
+    # app.run(host='192.168.0.105')
     app.run(debug=True)
+    

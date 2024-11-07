@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suggested Books</title>
+</head>
+<body>
+    <h1>Suggested Books</h1>
+
+    <h2>Top 10 Suggested Books</h2>
+    <ul>
+        {% for rec_book in recommended_books[:10] %}
+        <li>
+            <a href="{{ url_for('book_details', title=rec_book['Title'].iloc[0]) }}">{{ rec_book['Title'].iloc[0] }}</a>
+            <p><strong>Description:</strong> {{ rec_book['Description'].iloc[0] }}</p>
+            {% if rec_book.get('Category', '').iloc[0] %}
+                <p><strong>Category:</strong> {{ rec_book['Category'].iloc[0] }}</p>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('home') }}">Back to book list</a>
+</body>
+</html>

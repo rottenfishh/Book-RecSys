@@ -1,10 +1,13 @@
 import pandas as pd
+from nltk.corpus.reader import titles
 from sklearn.preprocessing import MultiLabelBinarizer
 import random
 import torch
 from transformers import BertTokenizer, BertModel
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+from difflib import get_close_matches
+
 
 class recSysModel:
     def __init__(self, path):
@@ -27,7 +30,7 @@ class recSysModel:
         self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         self.model = BertModel.from_pretrained('bert-base-uncased').to(self.device)
         self.dataset_df = self.dataset_df.drop(columns=['Authors', 'Category', 'Category_list', 'Publisher', 'Price Starting With ($)', 'Publish Date (Month)', 'Publish Date (Year)'])
-
+        self.titles = self.dataset_df["Title"].to_list()
     
     def __create_embedding(self, text):
         encoding = self.tokenizer.batch_encode_plus(
@@ -84,5 +87,9 @@ class recSysModel:
         sorted_indices = sorted(range(len(distances)), key=lambda k: distances[k])
         closest_names = [names[i] for i in sorted_indices[:n]]
         return closest_names
-    
+
+    def closest_title(self, title, size):
+        results = get_close_matches(title, self.titles, n=size, cutoff=0.5)
+        return results
+
 
