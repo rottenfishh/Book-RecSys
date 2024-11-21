@@ -91,4 +91,7 @@ class recSysModel:
         results = get_close_matches(title, self.titles, n=size, cutoff=0.5)
         return results
 
+    def get_record(self, title):
+        return self.embeddings_df[self.embeddings_df['name'] == title]
+
 
