@@ -21,8 +21,8 @@
     </ul>
 
     <div class="d-flex gap-2">
-        <a href="{{ book.recommendations_url }}" class="btn btn-primary">{{ book.Title }} recommendations</a>
-        <a href="{{ book.metric_url }}" class="btn btn-secondary">Help us to rate suggestions for this book</a>
+        <a href="{{ url_for('book_recommendations', title=book.Title) }}" class="btn btn-primary"> Recommendations</a>
+        <a href="{{ url_for('book_metric', title=book.Title) }}" class="btn btn-secondary">Help us to rate suggestions for this book</a>
         <a href="{{ url_for('home') }}" class="btn btn-link">Back to book list</a>
     </div>
 

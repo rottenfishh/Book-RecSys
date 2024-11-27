@@ -1,4 +1,5 @@
 import pandas as pd
+from PIL.ImImagePlugin import number
 from sklearn.preprocessing import MultiLabelBinarizer
 import random
 import torch
@@ -87,11 +88,15 @@ class recSysModel:
         closest_names = [names[i] for i in sorted_indices[:n]]
         return closest_names
 
+    def predict_by_description(self, description, n):
+        return None #should write
+
     def closest_title(self, title, size):
         results = get_close_matches(title, self.titles, n=size, cutoff=0.5)
         return results
 
     def get_record(self, title):
         return self.embeddings_df[self.embeddings_df['name'] == title]
+
 
 

@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify, render_template, url_for, redirect
 import pandas as pd
+
 from rec_sys_model import recSysModel
 
 app = Flask(__name__)
+
 
 # Чтение данных из CSV при старте приложения
 df = pd.read_csv('../Datasets/BooksDatasetClean.csv')
@@ -25,14 +27,23 @@ def home(page=1):
 
     # Генерируем URL для каждой книги
     for book in books:
-        book['details_url'] = url_for('book_details', title=book['Title'])
+        book['info'] = url_for('book_info', title=book['Title'])
+        book['recommendations_url'] = url_for('book_recommendations', title=book['Title'])
         book['metric_url'] = url_for('book_metric', title=book['Title'])
 
     return render_template('index.html', books=books, page=page, total_pages=total_pages)
 
 # Детальная страница книги
 @app.route('/book/<title>', methods=['GET'])
-def book_details(title):
+def book_info(title):
+    book = df[df['Title'] == title].to_dict(orient='records')
+    book = book[0]
+    if not book:
+        return "Book not found", 404
+    return render_template('book_info.html', book=book)
+
+@app.route('/book/rec/<title>', methods=['GET'])
+def book_recommendations(title):
     # Ищем книгу по названию
     book = df[df['Title'] == title].to_dict(orient='records')
     record = recsys.get_record(title)
@@ -42,12 +53,13 @@ def book_details(title):
 
     book = book[0]  # Берём первую найденную запись
     recommended_books = recsys.predict(record, n=10)
-    recommended_books_links = [
-        {"name": rec_book, "url": url_for('book_details', title=rec_book)}
+    recommended_books = [
+        {"name": rec_book, "url": url_for('book_info', title=rec_book),
+         "description": df[df['Title'] == rec_book]['Description'].to_string(index=False)}
         for rec_book in recommended_books
     ]
 
-    return render_template('book_details.html', book=book, recommended_books=recommended_books_links)
+    return render_template('book_recommendations.html', recommended_books=recommended_books)
 
 @app.route('/metric/<title>', methods=['GET'])
 def book_metric(title):
@@ -59,7 +71,7 @@ def book_metric(title):
     book = book[0]  # Берём первую (и единственную) найденную запись
     recommended_books = recsys.predict(record, n=100)
     recommended_books = [
-        {"name": rec_book, "url": url_for('book_details', title=rec_book),
+        {"name": rec_book, "url": url_for('book_info', title=rec_book),
          "description":  df[df['Title'] == rec_book]['Description'].to_string(index=False)}
         for rec_book in recommended_books
     ]
@@ -98,7 +110,20 @@ def search():
     recommended_books_links = [ df[df['Title'] == title] for title in recommended_books ]
     return render_template('closest_titles.html', recommended_books=recommended_books_links)
 
+@app.route('/suggest/by_description', methods=['GET'])
+def suggest_by_description():
+    description = request.args.get('description')  # Получаем параметр title из строки запроса
+    recommended_books = recsys.predict_by_description( description, n=10)
+    recommended_books = [
+        {"name": rec_book, "url": url_for('book_info', title=rec_book),
+         "description": df[df['Title'] == rec_book]['Description'].to_string(index=False)}
+        for rec_book in recommended_books
+    ]
+
+    return render_template('book_recommendations.html', recommended_books=recommended_books)
+
+
 if __name__ == '__main__':
     # app.run(host='192.168.0.105')
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=3000, debug=True)
     
