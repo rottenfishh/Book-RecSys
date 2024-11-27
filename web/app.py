@@ -5,6 +5,7 @@ from rec_sys_model import recSysModel
 
 app = Flask(__name__)
 
+
 # Чтение данных из CSV при старте приложения
 df = pd.read_csv('../Datasets/BooksDatasetClean.csv')
 metric = pd.read_csv('../Datasets/rating.csv')
@@ -124,5 +125,5 @@ def suggest_by_description():
 
 if __name__ == '__main__':
     # app.run(host='192.168.0.105')
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=3000, debug=True)
     
