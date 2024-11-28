@@ -9,6 +9,7 @@ import numpy as np
 from difflib import get_close_matches
 
 
+
 class recSysModel:
     def __init__(self, path):
         self.dataset_df = pd.read_csv(path)
@@ -88,8 +89,22 @@ class recSysModel:
         closest_names = [names[i] for i in sorted_indices[:n]]
         return closest_names
 
-    def predict_by_description(self, description, n):
-        return None #should write
+    def predict_by_description(self, description, n=5):
+        record_vector = self.__create_embedding(description)
+        distances = []
+        names = []
+        length = self.embeddings_df.shape[0]
+        for index, row in self.embeddings_df.iterrows():
+            other_vector = self.__parse_emb_str(row['book_embedding']).reshape(1, -1)
+            other_vector = other_vector[:, :768]
+            similarity = cosine_similarity(record_vector, other_vector)[0][0]
+            distance = 1 - similarity
+            distances.append(distance)
+            names.append(row['name'])
+            print(f'Progress: {index / length:.2%}', end='\r')
+        sorted_indices = sorted(range(len(distances)), key=lambda k: distances[k])
+        closest_names = [names[i] for i in sorted_indices[:n]]
+        return closest_names
 
     def closest_title(self, title, size):
         results = get_close_matches(title, self.titles, n=size, cutoff=0.5)
