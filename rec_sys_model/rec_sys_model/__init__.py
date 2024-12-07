@@ -94,4 +94,4 @@ class recSysModel:
         return results
 
     def get_record(self, title):
-        return self.embeddings_df[self.embeddings_df['name'] == title]
+        return self.embeddings_df[self.embeddings_df[:, 0] == title]
