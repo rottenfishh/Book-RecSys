@@ -1,10 +1,14 @@
 import pandas as pd
+from PIL.ImImagePlugin import number
 from sklearn.preprocessing import MultiLabelBinarizer
 import random
 import torch
 from transformers import BertTokenizer, BertModel
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+from difflib import get_close_matches
+
+
 
 class recSysModel:
     def __init__(self, path):
@@ -27,7 +31,7 @@ class recSysModel:
         self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         self.model = BertModel.from_pretrained('bert-base-uncased').to(self.device)
         self.dataset_df = self.dataset_df.drop(columns=['Authors', 'Category', 'Category_list', 'Publisher', 'Price Starting With ($)', 'Publish Date (Month)', 'Publish Date (Year)'])
-
+        self.titles = self.dataset_df["Title"].to_list()
     
     def __create_embedding(self, text):
         encoding = self.tokenizer.batch_encode_plus(
@@ -46,40 +50,48 @@ class recSysModel:
         return sentence_embedding.cpu()
     
     def train(self, df):
-        self.embeddings_df = pd.DataFrame()
         numerical_cols = self.dataset_df.select_dtypes(include=np.number).columns
         length = self.dataset_df.shape[0]
+        combined_data = []
         for index, row in self.dataset_df.iterrows():
             vector = self.__create_embedding(row['Description']).reshape(768)
             numerical_values = row[numerical_cols].values
             name = row['Title']
             combined_vector = np.concatenate((vector, numerical_values))
-            vector_str = ','.join(map(str, combined_vector))
-            new_row = pd.DataFrame({'book_embedding': [vector_str], 'name': [name]})
-            self.embeddings_df = pd.concat([self.embeddings_df, new_row], ignore_index=True)
+            combined_row = np.append(name, combined_vector)
+            combined_data.append(combined_row)
             print(f'Progress: {index / length:.2%}', end='\r')
+        self.embeddings_df = np.array(combined_data, dtype=object)
         return self.embeddings_df
     
     def load(self, path_book_embeddings):
-        self.embeddings_df = pd.read_csv(path_book_embeddings)
-    
-    def __parse_embedding(self, embedding_str):
-        return np.array([float(x) for x in embedding_str.split(',')])
+        self.embeddings_df = np.load(path_book_embeddings, allow_pickle = True)
     
     def predict(self, record, n=5):
-        record_vector = self.__parse_embedding(record['book_embedding']).reshape(1, -1)
-        distances = []
-        names = []
-        length = self.embeddings_df.shape[0]
-        for index, row in self.embeddings_df.iterrows():
-            other_vector = self.__parse_embedding(row['book_embedding']).reshape(1, -1)
-            similarity = cosine_similarity(record_vector, other_vector)[0][0]
-            distance = 1 - similarity
-            distances.append(distance)
-            names.append(row['name'])
-            print(f'Progress: {index / length:.2%}', end='\r')
-        sorted_indices = sorted(range(len(distances)), key=lambda k: distances[k])
-        closest_names = [names[i] for i in sorted_indices[:n]]
-        return closest_names
-    
+        record_vector = (record[1:]).astype(np.float64).reshape(1, -1)
+        record_vector = torch.from_numpy(record_vector)
+        data_matrix = (self.embeddings_df[:, 1:].astype(np.float64))
+        data_matrix = torch.from_numpy(data_matrix)
+        all_names = self.embeddings_df[:, 0]
+        distances = 1 - (torch.cosine_similiraty(record_vector, data_matrix))
+        sorted_indeces = np.argsort(distances)[:n]
+        names = all_names[sorted_indeces]
+        return list(names)
 
+    def predict_by_description(self, description, n=5):
+        record_vector = self.__create_embedding(description)
+        record_vector = torch.from_numpy(record_vector)
+        data_matrix = (self.embeddings_df[:, 1:].astype(np.float64))
+        data_matrix = torch.from_numpy(data_matrix)
+        all_names = self.embeddings_df[:, 0]
+        distances = 1 - (torch.cosine_similiraty(record_vector, data_matrix))
+        sorted_indeces = np.argsort(distances)[:n]
+        names = all_names[sorted_indeces]
+        return list(names)
+
+    def closest_title(self, title, size):
+        results = get_close_matches(title, self.titles, n=size, cutoff=0.5)
+        return results
+
+    def get_record(self, title):
+        return self.embeddings_df[self.embeddings_df['name'] == title]
