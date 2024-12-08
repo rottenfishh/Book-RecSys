@@ -89,6 +89,7 @@ class recSysModel:
         names = all_names[sorted_indeces]
         return list(names)
 
+
     def closest_title(self, title, size):
         results = get_close_matches(title, self.titles, n=size, cutoff=0.5)
         return results

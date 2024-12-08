@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.Title }}</title>
+    <!-- Подключение Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container my-4">
+    <h1 class="text-primary mb-4">{{ book.Title }}</h1>
+    <ul class="list-group mb-4">
+        <li class="list-group-item"><strong>Authors:</strong> {{ book.Authors }}</li>
+        <li class="list-group-item"><strong>Description:</strong> {{ book.Description }}</li>
+        <li class="list-group-item"><strong>Category:</strong> {{ book.Category }}</li>
+        <li class="list-group-item"><strong>Publisher:</strong> {{ book.Publisher }}</li>
+        <li class="list-group-item"><strong>Price:</strong> {{ book['Price Starting With ($)'] }}</li>
+        <li class="list-group-item">
+            <strong>Publish Date:</strong> {{ book['Publish Date (Month)'] }} {{ book['Publish Date (Year)'] }}
+        </li>
+    </ul>
+
+    <div class="d-flex gap-2">
+        <a href="{{ book.recommendations_url }}" class="btn btn-primary">{{ book.Title }} recommendations</a>
+        <a href="{{ book.metric_url }}" class="btn btn-secondary">Help us to rate suggestions for this book</a>
+        <a href="{{ url_for('home') }}" class="btn btn-link">Back to book list</a>
+    </div>
+
+    <!-- Подключение Bootstrap JS (опционально) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
