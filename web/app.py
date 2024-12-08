@@ -10,7 +10,7 @@ app = Flask(__name__)
 df = pd.read_csv('../Datasets/BooksDatasetClean.csv')
 metric = pd.read_csv('../Datasets/rating.csv')
 recsys = recSysModel('../Datasets/BooksDatasetClean.csv')
-recsys.load('../Datasets/new_df.csv')
+recsys.load('../Datasets/books_embeddings.npy')
 
 
 # Главная страница с пагинацией

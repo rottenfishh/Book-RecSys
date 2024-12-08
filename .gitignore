@@ -1,4 +1,5 @@
 Datasets/new_df.csv
+Datasets/books_embeddings.npy
 .idea
 .idea/*
 .idea/*/*
