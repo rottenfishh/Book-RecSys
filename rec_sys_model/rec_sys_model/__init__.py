@@ -73,18 +73,17 @@ class recSysModel:
         data_matrix = (self.embeddings_df[:, 1:].astype(np.float64))
         data_matrix = torch.from_numpy(data_matrix)
         all_names = self.embeddings_df[:, 0]
-        distances = 1 - (torch.cosine_similiraty(record_vector, data_matrix))
+        distances = 1 - (torch.cosine_similarity(record_vector, data_matrix))
         sorted_indeces = np.argsort(distances)[:n]
         names = all_names[sorted_indeces]
         return list(names)
 
     def predict_by_description(self, description, n=5):
         record_vector = self.__create_embedding(description)
-        record_vector = torch.from_numpy(record_vector)
-        data_matrix = (self.embeddings_df[:, 1:].astype(np.float64))
+        data_matrix = (self.embeddings_df[:, 1:769].astype(np.float64))
         data_matrix = torch.from_numpy(data_matrix)
         all_names = self.embeddings_df[:, 0]
-        distances = 1 - (torch.cosine_similiraty(record_vector, data_matrix))
+        distances = 1 - (torch.cosine_similarity(record_vector, data_matrix))
         sorted_indeces = np.argsort(distances)[:n]
         names = all_names[sorted_indeces]
         return list(names)
@@ -95,4 +94,12 @@ class recSysModel:
         return results
 
     def get_record(self, title):
-        return self.embeddings_df[self.embeddings_df[:, 0] == title]
+        # Преобразуем первый столбец в массив для сравнения
+        titles = self.embeddings_df[:, 0]
+        # Находим индексы, где названия совпадают
+        matching_indices = np.where(titles == title)[0]
+        if len(matching_indices) > 0:
+            return self.embeddings_df[matching_indices][0]
+        else:
+            return None  # Если совпадений нет
+
