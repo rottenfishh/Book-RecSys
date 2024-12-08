@@ -3,30 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ book.Title }}</title>
+    <title>{{ book.Title }} - Metrics</title>
     <!-- Подключение Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="container my-4">
-    <h1 class="text-primary mb-4">{{ book.Title }}</h1>
-    <ul class="list-group mb-4">
-        <li class="list-group-item"><strong>Authors:</strong> {{ book.Authors }}</li>
-        <li class="list-group-item"><strong>Description:</strong> {{ book.Description }}</li>
-        <li class="list-group-item"><strong>Category:</strong> {{ book.Category }}</li>
-        <li class="list-group-item"><strong>Publisher:</strong> {{ book.Publisher }}</li>
-        <li class="list-group-item"><strong>Price:</strong> {{ book['Price Starting With ($)'] }}</li>
-        <li class="list-group-item">
-            <strong>Publish Date:</strong> {{ book['Publish Date (Month)'] }} {{ book['Publish Date (Year)'] }}
-        </li>
-    </ul>
+<body>
+    <div class="container my-5">
+        <h1 class="mb-4">{{ book.Title }} - Metrics</h1>
+        <div class="mb-3">
+            <p><strong>Authors:</strong> {{ book.Authors }}</p>
+            <p><strong>Description:</strong> {{ book.Description }}</p>
+            <p><strong>Category:</strong> {{ book.Category }}</p>
+            <p><strong>Publisher:</strong> {{ book.Publisher }}</p>
+            <p><strong>Price:</strong> {{ book['Price Starting With ($)'] }}</p>
+            <p><strong>Publish Date:</strong> {{ book['Publish Date (Month)'] }} {{ book['Publish Date (Year)'] }}</p>
+        </div>
 
-    <div class="d-flex gap-2">
-        <a href="{{ book.recommendations_url }}" class="btn btn-primary">{{ book.Title }} recommendations</a>
-        <a href="{{ book.metric_url }}" class="btn btn-secondary">Help us to rate suggestions for this book</a>
-        <a href="{{ url_for('home') }}" class="btn btn-link">Back to book list</a>
+        <h2 class="mb-4">Top 100 Recommended Books</h2>
+        <ul class="list-group">
+            {% for rec_book in recommended_books %}
+            <li class="list-group-item">
+                <a href="{{ rec_book.url }}" class="text-decoration-none fw-bold">{{ rec_book.name }}</a>
+                <p><strong>Description:</strong> {{ rec_book.description }}</p>
+
+                <!-- Кнопки для оценки от 1 до 5 -->
+                <div class="d-flex gap-2">
+                    {% for rating in range(1, 6) %}
+                    <button type="button" class="btn btn-outline-primary rate-button" data-source-book="{{ book.Title }}" data-recommended-book="{{ rec_book.name }}" data-rating="{{ rating }}">
+                        Rate {{ rating }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <a href="{{ url_for('home') }}" class="btn btn-secondary mt-4">Back to book list</a>
     </div>
 
-    <!-- Подключение Bootstrap JS (опционально) -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Асинхронная отправка рейтинга через JavaScript -->
+    <script>
+        function submitRating(sourceBook, recommendedBook, rating) {
+            fetch("/rate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    source_book: sourceBook,
+                    recommended_book: recommendedBook,
+                    rating: rating
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert("Error: " + data.error);
+                } else {
+                    alert("Success: " + data.message);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        // Привязка обработчиков к кнопкам оценки
+        document.querySelectorAll(".rate-button").forEach(button => {
+            button.addEventListener("click", function() {
+                const sourceBook = this.getAttribute("data-source-book");
+                const recommendedBook = this.getAttribute("data-recommended-book");
+                const rating = this.getAttribute("data-rating");
+                submitRating(sourceBook, recommendedBook, rating);
+            });
+        });
+    </script>
 </body>
 </html>

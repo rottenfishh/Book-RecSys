@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template, url_for, redirect
 import pandas as pd
+from flask import request, render_template, url_for
 
 from rec_sys_model import recSysModel
 
@@ -101,7 +102,6 @@ def rate_book():
     metric.to_csv('../Datasets/rating.csv', index=False)
     return jsonify({"message": "Rating added successfully"})
 
-from flask import request, render_template, url_for
 
 @app.route('/search', methods=['GET'])
 def search():
