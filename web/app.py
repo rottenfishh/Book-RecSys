@@ -13,6 +13,8 @@ metric = pd.read_csv('../Datasets/rating.csv')
 recsys = recSysModel('../Datasets/BooksDatasetClean.csv')
 recsys.load('../Datasets/books_embeddings.npy')
 
+df = df[df['Description'].notna()]
+
 
 # Главная страница с пагинацией
 @app.route('/', methods=['GET'])
@@ -107,7 +109,10 @@ def rate_book():
 def search():
     title = request.args.get('title')  # Получаем параметр title из строки запроса
     recommended_books = recsys.closest_title(title, 10)
-    recommended_books_links = [ df[df['Title'] == title] for title in recommended_books ]
+    recommended_books_links = [
+        df[df['Title'] == title] for title in recommended_books
+        if not df[df['Title'] == title].empty  # Проверка на существование названия в df
+    ]
     return render_template('closest_titles.html', recommended_books=recommended_books_links)
 
 @app.route('/suggest/by_description', methods=['GET'])
@@ -118,6 +123,7 @@ def suggest_by_description():
         {"name": rec_book, "url": url_for('book_info', title=rec_book),
          "description": df[df['Title'] == rec_book]['Description'].to_string(index=False)}
         for rec_book in recommended_books
+        if not df[df['Title'] == rec_book].empty
     ]
 
     return render_template('book_recommendations.html', recommended_books=recommended_books)
