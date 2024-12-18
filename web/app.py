@@ -8,12 +8,13 @@ app = Flask(__name__)
 
 
 # Чтение данных из CSV при старте приложения
-df = pd.read_csv('../Datasets/BooksDatasetClean.csv')
+df = pd.read_csv('../Datasets/NewDataset.csv')
 metric = pd.read_csv('../Datasets/rating.csv')
-recsys = recSysModel('../Datasets/BooksDatasetClean.csv')
-recsys.load('../Datasets/books_embeddings.npy')
+recsys = recSysModel('../Datasets/NewDataset.csv')
+recsys.load('../Datasets/books_embeddings_new_dataset.npy')
 
 df = df[df['Description'].notna()]
+
 
 
 # Главная страница с пагинацией

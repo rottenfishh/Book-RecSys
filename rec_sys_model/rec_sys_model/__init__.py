@@ -30,7 +30,7 @@ class recSysModel:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         self.model = BertModel.from_pretrained('bert-base-uncased').to(self.device)
-        self.dataset_df = self.dataset_df.drop(columns=['Authors', 'Category', 'Category_list', 'Publisher', 'Price Starting With ($)', 'Publish Date (Month)', 'Publish Date (Year)'])
+        self.dataset_df = self.dataset_df.drop(columns=['Authors', 'Category', 'Publisher', 'Publish'])
         self.titles = self.dataset_df["Title"].to_list()
     
     def __create_embedding(self, text):

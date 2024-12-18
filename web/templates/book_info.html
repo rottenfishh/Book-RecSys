@@ -12,11 +12,9 @@
     <ul class="list-group mb-4">
         <li class="list-group-item"><strong>Authors:</strong> {{ book.Authors }}</li>
         <li class="list-group-item"><strong>Description:</strong> {{ book.Description }}</li>
-        <li class="list-group-item"><strong>Category:</strong> {{ book.Category }}</li>
-        <li class="list-group-item"><strong>Publisher:</strong> {{ book.Publisher }}</li>
-        <li class="list-group-item"><strong>Price:</strong> {{ book['Price Starting With ($)'] }}</li>
+        <li class="list-group-item"><strong>Category:</strong> {{ book.Category | default("Unknown", true) }}</li>
         <li class="list-group-item">
-            <strong>Publish Date:</strong> {{ book['Publish Date (Month)'] }} {{ book['Publish Date (Year)'] }}
+            <strong>Publish Date:</strong> {{ book['Publish'] }}
         </li>
     </ul>
 
