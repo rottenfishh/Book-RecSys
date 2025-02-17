@@ -1,6 +1,8 @@
-Datasets/new_df.csv
-Datasets/books_embeddings.npy
+*.csv
+*.npy
 .idea
 .idea/*
 .idea/*/*
 Datasets/*
+__pycache__
+*.egg-info
