@@ -1,5 +1,0 @@
-[core]
-    remote = yandexs3
-['remote "yandexs3"']
-    url = s3://books-2402
-    endpointurl = https://storage.yandexcloud.net
