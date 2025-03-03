@@ -11,7 +11,8 @@ class RecallKTitles:
         list2 = list(map(lambda x: str.lower(x[0]), list2))
         intersection = set(list1) & set(list2)  
         count = len(intersection)
-    
+        counter = intersections_with_all_books(list2)
+
         positions = []
         for item in intersection:
             pos1 = [i for i, x in enumerate(list1) if x == item]
@@ -20,21 +21,31 @@ class RecallKTitles:
     
         return {
             "intersect_count": count,
-            "intersecting_items": positions
+            "intersecting_items": positions,
+            "books_in_dataset": all
         }
 
+    def intersections_with_all_books(self, list2):
+        counter = 0
+        for book in list2:
+            if (df['Title'].str.lower() == book):
+                counter += 1
+        return counter
 
     def evaluate(self):
-        with open(self.recs_path, "r") as f:
-            actual = json.load(f)
+        with open("./computed.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
 
-        for book in actual.keys():
-            try:
-                predicted = self.model.recommend_by_title(book, n = self.k)
-                comparison_res = self.compare_lists(actual[book], predicted)
-                print(f"For book {book} found {comparison_res['intersect_count']} intersections with n = {self.k}")
+        for entry in data:
+            for book_info, recommendations in entry.items():
+                title, author, genres = eval(book_info)
 
-                comparison_res = self.compare_lists(actual[book][:10], predicted)
-                print(f"For book {book} found {comparison_res['intersect_count']} intersections with 10 best recommendations and n = {self.k}")
-            except ValueError:
-                print(f"{book} not found")
+                predicted = self.model.recommend_by_title(title, n=self.k)
+                comparison_res = self.compare_lists(recommendations, predicted)
+                print(f"For book {title} found {comparison_res['intersect_count']} intersections with n = {self.k}, dataset have = {comparison_res['books_in_dataset']}")
+
+                comparison_res = self.compare_lists(recommendations[:10], predicted)
+                print(
+                    f"For book {title} found {comparison_res['intersect_count']} intersections with 10 best recommendations and n = {self.k}, dataset have = {comparison_res['books_in_dataset']}")
+
+                print("\n" + "-" * 50 + "\n")
