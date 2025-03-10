@@ -1,7 +1,0 @@
-setup.py
-rec_sys_model/__init__.py
-rec_sys_model.egg-info/PKG-INFO
-rec_sys_model.egg-info/SOURCES.txt
-rec_sys_model.egg-info/dependency_links.txt
-rec_sys_model.egg-info/requires.txt
-rec_sys_model.egg-info/top_level.txt
