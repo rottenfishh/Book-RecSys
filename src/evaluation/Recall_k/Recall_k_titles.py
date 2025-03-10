@@ -37,8 +37,9 @@ class RecallKTitles:
     def evaluate(self):
         with open(self.recs_path, "r", encoding="utf-8") as f:
             data = json.load(f)
-
+        count = 0
         for entry in data:
+            count += 1
             for book_info, recommendations in entry.items():
                 try:
                     title, author, genres = eval(book_info)
@@ -55,3 +56,4 @@ class RecallKTitles:
 
                 except ValueError:
                     print(f"{title} not found")
+        print(f"Test was by {count} books")
