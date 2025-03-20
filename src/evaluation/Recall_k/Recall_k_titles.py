@@ -54,9 +54,10 @@ class RecallKTitles:
             - "Recall" (float): Recall metric computed as TP / (TP + FN).
         """
         stats_list = []
+        gt_recs = [title for title, author in gt_recs]
         for n in range(min_n, max_n, step):
             stats = {}
-            print(predicted[0], gt_recs[0])
+            print(predicted[0], gt_recs)
             stats["TP"] = len(set(predicted[:n]) & set(gt_recs))
             stats["FN"] = len(set(gt_recs) - set(predicted[:n]))
             stats["Recall"] = stats["TP"] / (stats["TP"] + stats["FN"])
@@ -86,7 +87,7 @@ class RecallKTitles:
         stat_list = []
         for rec in self.recs_distilled:
             title = rec[0][0]
-            preds = self.model.recommend_by_title(title, n=max_n)
+            preds = [title for title, acc in self.model.recommend_by_title(title, n=max_n)]
             stat_list.append((rec[0], self.stats(preds, rec[1], min_n, step, max_n)))
 
         return stat_list
@@ -99,6 +100,7 @@ class RecallKTitles:
                 preds = self.model.recommend_by_title(title, n=max_n)
             except:
                 continue
+            preds = [title for title, acc in preds]
             stat_list.append((rec[0], self.stats(preds, rec[1], min_n, step, max_n)))
 
         return stat_list
