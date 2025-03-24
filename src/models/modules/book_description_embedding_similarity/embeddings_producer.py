@@ -7,7 +7,7 @@ class EmbeddingsProducer:
         self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         self.model = BertModel.from_pretrained('bert-base-uncased').to(self.device)
 
-    def __create_embedding(self, text):
+    def create_embedding(self, text):
         encoding = self.tokenizer.batch_encode_plus(
             [text],
             padding=True,
