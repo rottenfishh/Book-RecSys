@@ -3,8 +3,8 @@ import pandas as pd
 import json
 import math
 
-API_KEY = "" #NIGGER_KEY
-MODEL = "" #slave
+API_KEY = "" #
+MODEL = "" #
 CSV_PATH = "output.csv" #pyt koroche
 BATCH_SIZE = 4000
 
